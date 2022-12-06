@@ -7,39 +7,68 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 @Preview
 fun App() {
     val store = DailyUpdateStore()
     val goals = remember { store.goals }
+    val meetings = remember { store.meetings }
     val clipboardManager = LocalClipboardManager.current
+
+    var copiedToClipboardInfoVisible by remember { mutableStateOf(false) }
 
     MaterialTheme {
         Column {
-            Goals(
-                goals = goals,
-                onGoalContentChange = store::onGoalContentChanged,
-                onGoalCompleteChange = store::onGoalCompleteChanged,
-                onGoalAdded = store::onGoalAdded
+            Updates(
+                updates = goals,
+                title = "Goals",
+                onUpdateContentChange = store::onGoalContentChanged,
+                onUpdateCompleteChange = store::onGoalCompleteChanged,
+                onUpdateAdded = store::onGoalAdded,
+                newUpdateButtonText = "New goal",
+            )
+
+            Updates(
+                updates = meetings,
+                title = "Meetings",
+                onUpdateContentChange = store::onMeetingContentChanged,
+                onUpdateCompleteChange = { _, _ -> },
+                onUpdateAdded = store::onMeetingAdded,
+                newUpdateButtonText = "New meeting",
             )
 
             Button(
                 onClick = {
                     clipboardManager.setText(AnnotatedString(store.createUpdateText()))
+                    copiedToClipboardInfoVisible = true
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Create daily update text")
+            }
+
+            if (copiedToClipboardInfoVisible) {
+                rememberCoroutineScope().launch {
+                    delay(2000)
+                    copiedToClipboardInfoVisible = false
+                }
+                Text(
+                    text = "✅ Copied to clipboard",
+                    style = TextStyle(color = Color.Green),
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)
+                )
             }
         }
 
@@ -47,11 +76,13 @@ fun App() {
 }
 
 @Composable
-fun Goals(
-    goals: List<Goal>,
-    onGoalContentChange: (Int, String) -> Unit,
-    onGoalCompleteChange: (Int, Boolean) -> Unit,
-    onGoalAdded: () -> Unit,
+fun Updates(
+    updates: List<Update>,
+    title: String,
+    newUpdateButtonText: String,
+    onUpdateContentChange: (Int, String) -> Unit,
+    onUpdateCompleteChange: (Int, Boolean) -> Unit,
+    onUpdateAdded: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -60,18 +91,18 @@ fun Goals(
         Text(
             modifier = Modifier.padding(vertical = 16.dp),
             style = TextStyle(fontSize = 28.sp),
-            text = "Goals"
+            text = title
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(goals) { index, goal ->
+            itemsIndexed(updates) { index, update ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     TextField(
-                        value = goal.content,
-                        onValueChange = { onGoalContentChange(index, it) },
+                        value = update.content,
+                        onValueChange = { onUpdateContentChange(index, it) },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -84,11 +115,11 @@ fun Goals(
         }
 
         Button(
-            onClick = onGoalAdded,
+            onClick = onUpdateAdded,
             modifier = Modifier.padding(top = 16.dp).align(Alignment.End)
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            Text(modifier = Modifier.padding(start = 8.dp), text = "New goal")
+            Text(modifier = Modifier.padding(start = 8.dp), text = newUpdateButtonText)
         }
     }
 }
