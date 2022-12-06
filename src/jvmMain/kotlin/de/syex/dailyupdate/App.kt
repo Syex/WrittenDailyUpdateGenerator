@@ -25,7 +25,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -60,7 +59,6 @@ fun App() {
                 updates = goals,
                 title = "Goals",
                 onUpdateContentChange = store::onGoalContentChanged,
-                onUpdateCompleteChange = store::onGoalCompleteChanged,
                 onUpdateAdded = store::onGoalAdded,
                 newUpdateButtonText = "New goal",
                 shortcutKey = "G"
@@ -70,7 +68,6 @@ fun App() {
                 updates = meetings,
                 title = "Meetings",
                 onUpdateContentChange = store::onMeetingContentChanged,
-                onUpdateCompleteChange = { _, _ -> },
                 onUpdateAdded = store::onMeetingAdded,
                 newUpdateButtonText = "New meeting",
                 shortcutKey = "M"
@@ -87,7 +84,7 @@ fun App() {
             }
 
             if (copiedToClipboardInfoVisible) {
-                rememberCoroutineScope().launch {
+                LaunchedEffect(Unit) {
                     delay(2000)
                     copiedToClipboardInfoVisible = false
                 }
@@ -109,7 +106,6 @@ fun Updates(
     title: String,
     newUpdateButtonText: String,
     onUpdateContentChange: (Int, String) -> Unit,
-    onUpdateCompleteChange: (Int, Boolean) -> Unit,
     onUpdateAdded: () -> Unit,
     shortcutKey: String,
 ) {
@@ -139,11 +135,6 @@ fun Updates(
                     LaunchedEffect(Unit) {
                         if (update.content.isEmpty()) focusRequester.requestFocus()
                     }
-
-//                    Checkbox(
-//                        checked = goal.completed ?: false,
-//                        onCheckedChange = { onGoalCompleteChange(index, it) }
-//                    )
                 }
             }
         }

@@ -11,10 +11,6 @@ class DailyUpdateStore {
         goals[index] = goals[index].copy(content = newContent)
     }
 
-    fun onGoalCompleteChanged(index: Int, completed: Boolean) {
-        goals[index] = goals[index].copy(completed = completed)
-    }
-
     fun onGoalAdded() = goals.add(Goal())
 
     fun onMeetingContentChanged(index: Int, newContent: String) {
