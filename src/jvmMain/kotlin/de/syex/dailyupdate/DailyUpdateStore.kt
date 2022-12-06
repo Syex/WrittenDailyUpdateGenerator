@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 class DailyUpdateStore {
 
     val goals = mutableStateListOf(Goal())
-    val meetings = mutableStateListOf(Meeting())
+    val meetings = mutableStateListOf<Meeting>()
 
     fun onGoalContentChanged(index: Int, newContent: String) {
         goals[index] = goals[index].copy(content = newContent)

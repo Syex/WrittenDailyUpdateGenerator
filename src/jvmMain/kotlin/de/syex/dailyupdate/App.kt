@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -127,11 +129,16 @@ fun Updates(
         ) {
             itemsIndexed(updates) { index, update ->
                 Row(modifier = Modifier.fillMaxWidth()) {
+                    val focusRequester = remember { FocusRequester() }
                     TextField(
                         value = update.content,
                         onValueChange = { onUpdateContentChange(index, it) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).focusRequester(focusRequester)
                     )
+
+                    LaunchedEffect(Unit) {
+                        if (update.content.isEmpty()) focusRequester.requestFocus()
+                    }
 
 //                    Checkbox(
 //                        checked = goal.completed ?: false,
