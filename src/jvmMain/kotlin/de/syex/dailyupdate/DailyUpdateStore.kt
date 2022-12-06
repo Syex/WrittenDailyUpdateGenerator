@@ -4,8 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 
 class DailyUpdateStore {
 
-    val goals = mutableStateListOf<Goal>()
-    val meetings = mutableStateListOf<Update>()
+    val goals = mutableStateListOf(Goal())
+    val meetings = mutableStateListOf(Meeting())
 
     fun onGoalContentChanged(index: Int, newContent: String) {
         goals[index] = goals[index].copy(content = newContent)
@@ -25,11 +25,11 @@ class DailyUpdateStore {
 
     fun createUpdateText(): String {
         val builder = StringBuilder()
-        goals.forEach {
+        goals.filter { it.content.isNotBlank() }.forEach {
             builder.appendLine("🥅 ${it.content}")
         }
 
-        meetings.forEach {
+        meetings.filter { it.content.isNotBlank() }.forEach {
             builder.appendLine("👥 ${it.content}")
         }
 
