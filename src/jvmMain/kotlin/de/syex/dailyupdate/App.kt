@@ -24,13 +24,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.syex.dailyupdate.storage.DriverFactory
+import de.syex.dailyupdate.storage.createDatabase
 import kotlinx.coroutines.delay
+import javax.swing.filechooser.FileSystemView
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Preview
 fun App() {
-    val store = DailyUpdateStore()
+    val defaultDirectoryPath = FileSystemView.getFileSystemView().defaultDirectory.path
+    val dailyUpdateDatabase = createDatabase(DriverFactory(defaultDirectoryPath))
+    val store = DailyUpdateStore(dailyUpdateDatabase)
+
     val goals = remember { store.goals }
     val meetings = remember { store.meetings }
     val clipboardManager = LocalClipboardManager.current

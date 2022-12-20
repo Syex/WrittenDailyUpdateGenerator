@@ -1,5 +1,13 @@
-CREATE TABLE daily_update(
+CREATE TABLE IF NOT EXISTS dailyUpdateTable(
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   content TEXT NOT NULL,
   completed INTEGER AS Boolean DEFAULT 0
 );
+
+selectAll:
+SELECT *
+FROM dailyUpdateTable;
+
+insert:
+INSERT INTO dailyUpdateTable(content, completed)
+VALUES (?, ?);

@@ -2,7 +2,9 @@ package de.syex.dailyupdate
 
 import androidx.compose.runtime.mutableStateListOf
 
-class DailyUpdateStore {
+class DailyUpdateStore(
+    private val database: DailyUpdateDatabase
+) {
 
     val goals = mutableStateListOf(Goal())
     val meetings = mutableStateListOf<Meeting>()

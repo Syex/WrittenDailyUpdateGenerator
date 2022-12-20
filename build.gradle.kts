@@ -29,6 +29,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("com.squareup.sqldelight:sqlite-driver:${extra["sqldelight.version"] as String}")
+                implementation("org.xerial:sqlite-jdbc:3.40.0.0")
             }
         }
         val jvmTest by getting

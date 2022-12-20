@@ -1,7 +1,15 @@
 import kotlin.collections.List;
 
-CREATE TABLE created_daily_update(
+CREATE TABLE IF NOT EXISTS createdDailyUpdateTable(
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   updates TEXT AS List<String> NOT NULL,
   created_at TEXT NOT NULL
 );
+
+selectAll:
+SELECT *
+FROM createdDailyUpdateTable;
+
+insert:
+INSERT INTO createdDailyUpdateTable(updates, created_at)
+VALUES (?, ?);
