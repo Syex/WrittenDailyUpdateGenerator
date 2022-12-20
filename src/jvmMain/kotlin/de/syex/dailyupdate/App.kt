@@ -77,14 +77,23 @@ fun App() {
 
             Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
 
-            Button(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(store.createUpdateText()))
-                    copiedToClipboardInfoVisible = true
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Create daily update text")
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Button(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(store.createUpdateText()))
+                        copiedToClipboardInfoVisible = true
+                    },
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Text("Create daily update text")
+                }
+
+                Button(
+                    onClick = { store.onCleared() },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White)
+                ) {
+                    Text("Clear")
+                }
             }
 
             if (copiedToClipboardInfoVisible) {

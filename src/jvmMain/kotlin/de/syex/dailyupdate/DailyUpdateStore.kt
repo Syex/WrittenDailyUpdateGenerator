@@ -31,4 +31,9 @@ class DailyUpdateStore {
 
         return builder.toString()
     }
+
+    fun onCleared() {
+        goals.clear()
+        meetings.clear()
+    }
 }
