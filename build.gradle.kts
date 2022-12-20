@@ -1,10 +1,9 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("com.squareup.sqldelight")
 }
 
 group = "de.syex"
@@ -24,9 +23,12 @@ kotlin {
         withJava()
     }
     sourceSets {
+        val commonMain by getting
+
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation("com.squareup.sqldelight:sqlite-driver:${extra["sqldelight.version"] as String}")
             }
         }
         val jvmTest by getting
@@ -41,5 +43,11 @@ compose.desktop {
             packageName = "DailyUpdate"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+sqldelight {
+    database("DailyUpdateDatabase") {
+        packageName = "de.syex.dailyupdate"
     }
 }

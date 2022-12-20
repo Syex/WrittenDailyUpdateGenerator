@@ -1,0 +1,5 @@
+CREATE TABLE daily_update(
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  content TEXT NOT NULL,
+  completed INTEGER AS Boolean DEFAULT 0
+);

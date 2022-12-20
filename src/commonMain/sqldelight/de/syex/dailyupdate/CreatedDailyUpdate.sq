@@ -1,0 +1,7 @@
+import kotlin.collections.List;
+
+CREATE TABLE created_daily_update(
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  updates TEXT AS List<String> NOT NULL,
+  created_at TEXT NOT NULL
+);
