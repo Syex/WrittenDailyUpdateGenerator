@@ -64,6 +64,8 @@ fun App() {
                 shortcutKey = "G"
             )
 
+            Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
+
             Updates(
                 updates = meetings,
                 title = "Meetings",
@@ -72,6 +74,8 @@ fun App() {
                 newUpdateButtonText = "New meeting",
                 shortcutKey = "M"
             )
+
+            Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
 
             Button(
                 onClick = {
