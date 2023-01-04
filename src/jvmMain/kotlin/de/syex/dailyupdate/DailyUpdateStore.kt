@@ -20,7 +20,7 @@ class DailyUpdateStore(
     private fun loadCreatedUpdatesHistory() {
         createdUpdates.clear()
         val storedDailyUpdates = database.dailyUpdateQueries.selectAll().executeAsList()
-        database.createdDailyUpdateQueries.selectAll().executeAsList().forEach { storedDailyUpdate ->
+        database.createdDailyUpdateQueries.selectAll().executeAsList().reversed().forEach { storedDailyUpdate ->
             val dailyUpdates = storedDailyUpdate.updates.mapNotNull { id ->
                 storedDailyUpdates.find { it.id == id }?.let {
                     if (it.isGoal) Goal(it.content, it.completed) else Meeting(it.content)
