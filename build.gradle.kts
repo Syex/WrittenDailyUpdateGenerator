@@ -29,7 +29,6 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("com.squareup.sqldelight:sqlite-driver:${extra["sqldelight.version"] as String}")
-                implementation("org.xerial:sqlite-jdbc:3.40.0.0")
             }
         }
         val jvmTest by getting
@@ -43,6 +42,9 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "DailyUpdate"
             packageVersion = "1.0.0"
+            // required for SQLDelight and java.sql.DriverManager
+            // see https://github.com/JetBrains/compose-jb/issues/381
+            modules("java.sql")
         }
     }
 }
