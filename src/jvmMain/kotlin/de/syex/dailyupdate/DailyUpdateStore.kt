@@ -11,6 +11,7 @@ class DailyUpdateStore(
     val createdUpdates = mutableStateListOf<CreatedUpdate>()
     val goals = mutableStateListOf(Goal())
     val meetings = mutableStateListOf<Meeting>()
+    private var isInHistoryViewMode = false
 
     init {
         loadCreatedUpdatesHistory()
@@ -40,6 +41,7 @@ class DailyUpdateStore(
         meetings.clear()
         goals.addAll(createdUpdate.goals)
         meetings.addAll(createdUpdate.meetings)
+        isInHistoryViewMode = true
     }
 
     fun onGoalContentChanged(index: Int, newContent: String) {
@@ -66,7 +68,7 @@ class DailyUpdateStore(
             builder.appendLine("👥 ${it.content}")
         }
 
-        insertUpdateIntoDatabase()
+        if (!isInHistoryViewMode) insertUpdateIntoDatabase()
 
         return builder.toString()
     }
@@ -100,5 +102,6 @@ class DailyUpdateStore(
     fun onCleared() {
         goals.clear()
         meetings.clear()
+        isInHistoryViewMode = false
     }
 }
