@@ -75,6 +75,7 @@ private fun UpdateDetailView(
 ) {
     val goals = remember { store.goals }
     val meetings = remember { store.meetings }
+    val isInHistoryViewMode by store.isInHistoryViewMode
     val clipboardManager = LocalClipboardManager.current
 
     var copiedToClipboardInfoVisible by remember { mutableStateOf(false) }
@@ -100,8 +101,10 @@ private fun UpdateDetailView(
             title = "Goals",
             onUpdateContentChange = store::onGoalContentChanged,
             onUpdateAdded = store::onGoalAdded,
+            onGoalCompletedChange = store::onGoalCompletedChanged,
             newUpdateButtonText = "New goal",
-            shortcutKey = "G"
+            shortcutKey = "G",
+            showCheckboxes = isInHistoryViewMode
         )
 
         Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
@@ -112,7 +115,8 @@ private fun UpdateDetailView(
             onUpdateContentChange = store::onMeetingContentChanged,
             onUpdateAdded = store::onMeetingAdded,
             newUpdateButtonText = "New meeting",
-            shortcutKey = "M"
+            shortcutKey = "M",
+            showCheckboxes = false
         )
 
         Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
@@ -158,7 +162,9 @@ fun Updates(
     newUpdateButtonText: String,
     onUpdateContentChange: (Int, String) -> Unit,
     onUpdateAdded: () -> Unit,
+    onGoalCompletedChange: (Int, Boolean) -> Unit = { _, _ -> },
     shortcutKey: String,
+    showCheckboxes: Boolean,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -181,6 +187,14 @@ fun Updates(
 
                     LaunchedEffect(Unit) {
                         if (update.content.isEmpty()) focusRequester.requestFocus()
+                    }
+
+                    if (showCheckboxes && update is Goal) {
+                        Checkbox(
+                            checked = update.completed,
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            onCheckedChange = { onGoalCompletedChange(index, it) }
+                        )
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package de.syex.dailyupdate
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -11,7 +12,7 @@ class DailyUpdateStore(
     val createdUpdates = mutableStateListOf<CreatedUpdate>()
     val goals = mutableStateListOf(Goal())
     val meetings = mutableStateListOf<Meeting>()
-    private var isInHistoryViewMode = false
+    var isInHistoryViewMode = mutableStateOf(false)
 
     init {
         loadCreatedUpdatesHistory()
@@ -23,7 +24,7 @@ class DailyUpdateStore(
         database.createdDailyUpdateQueries.selectAll().executeAsList().reversed().forEach { storedDailyUpdate ->
             val dailyUpdates = storedDailyUpdate.updates.mapNotNull { id ->
                 storedDailyUpdates.find { it.id == id }?.let {
-                    if (it.isGoal) Goal(it.content, it.completed) else Meeting(it.content)
+                    if (it.isGoal) Goal(it.content, it.completed ?: false) else Meeting(it.content)
                 }
             }
             val goals = dailyUpdates.filterIsInstance<Goal>()
@@ -41,11 +42,15 @@ class DailyUpdateStore(
         meetings.clear()
         goals.addAll(createdUpdate.goals)
         meetings.addAll(createdUpdate.meetings)
-        isInHistoryViewMode = true
+        isInHistoryViewMode.value = true
     }
 
     fun onGoalContentChanged(index: Int, newContent: String) {
         goals[index] = goals[index].copy(content = newContent)
+    }
+
+    fun onGoalCompletedChanged(index: Int, completed: Boolean) {
+        goals[index] = goals[index].copy(completed = completed)
     }
 
     fun onGoalAdded() = goals.add(Goal())
@@ -61,14 +66,22 @@ class DailyUpdateStore(
         goals.removeIf { it.content.isBlank() }
         meetings.removeIf { it.content.isBlank() }
         goals.forEach {
-            builder.appendLine("🥅 ${it.content}")
+            builder.append("🥅 ${it.content}")
+            if (isInHistoryViewMode.value) {
+                if (it.completed) {
+                    builder.append(" ✅")
+                } else {
+                    builder.append(" ❌")
+                }
+            }
+            builder.appendLine()
         }
 
         meetings.forEach {
             builder.appendLine("👥 ${it.content}")
         }
 
-        if (!isInHistoryViewMode) insertUpdateIntoDatabase()
+        if (!isInHistoryViewMode.value) insertUpdateIntoDatabase()
 
         return builder.toString()
     }
@@ -102,6 +115,6 @@ class DailyUpdateStore(
     fun onCleared() {
         goals.clear()
         meetings.clear()
-        isInHistoryViewMode = false
+        isInHistoryViewMode.value = false
     }
 }

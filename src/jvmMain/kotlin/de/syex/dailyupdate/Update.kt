@@ -7,7 +7,7 @@ interface Update {
 
 data class Goal(
     override var content: String = "",
-    var completed: Boolean? = null
+    var completed: Boolean = false
 ) : Update
 
 data class Meeting(
