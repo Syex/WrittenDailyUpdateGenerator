@@ -13,13 +13,13 @@ expect class DriverFactory {
 fun createDatabase(driverFactory: DriverFactory): DailyUpdateDatabase {
     val driver = driverFactory.createDriver()
     val dailyUpdatesAdapter = CreatedDailyUpdateTable.Adapter(
-        updatesAdapter = object : ColumnAdapter<List<String>, String> {
-            override fun decode(databaseValue: String): List<String> {
-                return databaseValue.split(",")
+        updatesAdapter = object : ColumnAdapter<List<Long>, String> {
+            override fun decode(databaseValue: String): List<Long> {
+                return databaseValue.split(",").map { it.toLong() }
             }
 
-            override fun encode(value: List<String>): String {
-                return value.joinToString(separator = ",") { it }
+            override fun encode(value: List<Long>): String {
+                return value.joinToString(separator = ",") { it.toString() }
             }
 
         }

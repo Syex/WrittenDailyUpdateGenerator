@@ -1,9 +1,21 @@
 package de.syex.dailyupdate
 
-typealias Goal = Update
-typealias Meeting = Update
+interface Update {
 
-data class Update(
-    var content: String = "",
+    var content: String
+}
+
+data class Goal(
+    override var content: String = "",
     var completed: Boolean? = null
+) : Update
+
+data class Meeting(
+    override var content: String = "",
+) : Update
+
+data class CreatedUpdate(
+    val goals: List<Goal>,
+    val meetings: List<Meeting>,
+    val createdAt: String
 )

@@ -29,7 +29,6 @@ import de.syex.dailyupdate.storage.createDatabase
 import kotlinx.coroutines.delay
 import javax.swing.filechooser.FileSystemView
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Preview
 fun App() {
@@ -37,84 +36,117 @@ fun App() {
     val dailyUpdateDatabase = createDatabase(DriverFactory(defaultDirectoryPath))
     val store = DailyUpdateStore(dailyUpdateDatabase)
 
+    MaterialTheme {
+        Row {
+            UpdateHistoryView(store)
+            Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+            UpdateDetailView(store)
+        }
+    }
+}
+
+@Composable
+private fun UpdateHistoryView(
+    store: DailyUpdateStore,
+) {
+    val createdUpdates = remember { store.createdUpdates }
+
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        TitleText("Previous updates")
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            itemsIndexed(createdUpdates) { index, createdUpdate ->
+                Row {
+                    TextButton(onClick = { store.onTapOnCreatedUpdate(index) }) {
+                        Text(createdUpdate.createdAt)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun UpdateDetailView(
+    store: DailyUpdateStore,
+) {
     val goals = remember { store.goals }
     val meetings = remember { store.meetings }
     val clipboardManager = LocalClipboardManager.current
 
     var copiedToClipboardInfoVisible by remember { mutableStateOf(false) }
-
-    MaterialTheme {
-        Column(
-            modifier = Modifier.onKeyEvent {
-                when {
-                    it.isMetaPressed && it.key == Key.G && it.type == KeyEventType.KeyUp -> {
-                        store.onGoalAdded()
-                        true
-                    }
-
-                    it.isMetaPressed && it.key == Key.M && it.type == KeyEventType.KeyUp -> {
-                        store.onMeetingAdded()
-                        true
-                    }
-
-                    else -> false
+    Column(
+        modifier = Modifier.onKeyEvent {
+            when {
+                it.isMetaPressed && it.key == Key.G && it.type == KeyEventType.KeyUp -> {
+                    store.onGoalAdded()
+                    true
                 }
+
+                it.isMetaPressed && it.key == Key.M && it.type == KeyEventType.KeyUp -> {
+                    store.onMeetingAdded()
+                    true
+                }
+
+                else -> false
             }
-        ) {
-            Updates(
-                updates = goals,
-                title = "Goals",
-                onUpdateContentChange = store::onGoalContentChanged,
-                onUpdateAdded = store::onGoalAdded,
-                newUpdateButtonText = "New goal",
-                shortcutKey = "G"
-            )
+        }
+    ) {
+        Updates(
+            updates = goals,
+            title = "Goals",
+            onUpdateContentChange = store::onGoalContentChanged,
+            onUpdateAdded = store::onGoalAdded,
+            newUpdateButtonText = "New goal",
+            shortcutKey = "G"
+        )
 
-            Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
+        Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
 
-            Updates(
-                updates = meetings,
-                title = "Meetings",
-                onUpdateContentChange = store::onMeetingContentChanged,
-                onUpdateAdded = store::onMeetingAdded,
-                newUpdateButtonText = "New meeting",
-                shortcutKey = "M"
-            )
+        Updates(
+            updates = meetings,
+            title = "Meetings",
+            onUpdateContentChange = store::onMeetingContentChanged,
+            onUpdateAdded = store::onMeetingAdded,
+            newUpdateButtonText = "New meeting",
+            shortcutKey = "M"
+        )
 
-            Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
+        Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 2.dp)
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Button(
-                    onClick = {
-                        clipboardManager.setText(AnnotatedString(store.createUpdateText()))
-                        copiedToClipboardInfoVisible = true
-                    },
-                    modifier = Modifier.padding(end = 16.dp)
-                ) {
-                    Text("Create daily update text")
-                }
-
-                Button(
-                    onClick = { store.onCleared() },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White)
-                ) {
-                    Text("Clear")
-                }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Button(
+                onClick = {
+                    clipboardManager.setText(AnnotatedString(store.onCreateUpdateTextTapped()))
+                    copiedToClipboardInfoVisible = true
+                },
+                modifier = Modifier.padding(end = 16.dp)
+            ) {
+                Text("Create daily update text")
             }
 
-            if (copiedToClipboardInfoVisible) {
-                LaunchedEffect(Unit) {
-                    delay(2000)
-                    copiedToClipboardInfoVisible = false
-                }
-                Text(
-                    text = "✅ Copied to clipboard",
-                    style = TextStyle(color = Color.Green),
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)
-                )
+            Button(
+                onClick = { store.onCleared() },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White)
+            ) {
+                Text("Clear")
             }
         }
 
+        if (copiedToClipboardInfoVisible) {
+            LaunchedEffect(Unit) {
+                delay(2000)
+                copiedToClipboardInfoVisible = false
+            }
+            Text(
+                text = "✅ Copied to clipboard",
+                style = TextStyle(color = Color.Green),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)
+            )
+        }
     }
 }
 
@@ -132,11 +164,7 @@ fun Updates(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
     ) {
 
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            style = TextStyle(fontSize = 28.sp),
-            text = title
-        )
+        TitleText(title)
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -181,4 +209,13 @@ fun Updates(
             }
         }
     }
+}
+
+@Composable
+private fun TitleText(title: String) {
+    Text(
+        modifier = Modifier.padding(vertical = 16.dp),
+        style = TextStyle(fontSize = 28.sp),
+        text = title
+    )
 }

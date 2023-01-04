@@ -11,7 +11,7 @@ import androidx.compose.ui.window.application
 fun main() = application {
     Window(
         title = "Daily Update Generator",
-        state = WindowState(size = DpSize(800.dp, 1200.dp), position = WindowPosition(Alignment.Center)),
+        state = WindowState(size = DpSize(1024.dp, 1024.dp), position = WindowPosition(Alignment.Center)),
         onCloseRequest = ::exitApplication
     ) {
         App()

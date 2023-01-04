@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS dailyUpdateTable(
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   content TEXT NOT NULL,
+  isGoal INTEGER AS Boolean DEFAULT 0 NOT NULL,
   completed INTEGER AS Boolean DEFAULT 0
 );
 
@@ -9,5 +10,8 @@ SELECT *
 FROM dailyUpdateTable;
 
 insert:
-INSERT INTO dailyUpdateTable(content, completed)
-VALUES (?, ?);
+INSERT INTO dailyUpdateTable(content, isGoal, completed)
+VALUES (?, ?, ?);
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
